@@ -7,9 +7,9 @@ services:
     depends_on:
     #  - balancer
     #  - processor
-     - nats
+     - bnnc_nats
     links:
-     - nats:nats
+     - bnnc_nats:bnnc_nats
     env_file:
       - .env
     # environment:
@@ -63,10 +63,10 @@ services:
   #   env_file:
   #     - .env
       
-  nats:
+  bnnc_nats:
     image: nats:2.10.22-alpine3.20
-    container_name: nats
+    container_name: bnnc_nats
     restart: always
-    hostname: nats
+    hostname: bnnc_nats
     command: --js
 
