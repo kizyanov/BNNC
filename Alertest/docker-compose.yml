@@ -1,0 +1,7 @@
+services:
+  alertest:
+    image: kizyanov/bnnc_alertest:latest
+    build: .
+    container_name: bnnc_alertest
+    tty: true
+    restart: always

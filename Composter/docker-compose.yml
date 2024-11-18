@@ -1,0 +1,21 @@
+services:
+  bnnc_composter:
+    image: kizyanov/bnnc_composter:latest
+    build: .
+    container_name: bnnc_composter
+    tty: true
+    restart: always
+    # links:
+    #  - nats:nats
+    # environment:
+    #   - ALLCURRENCY=OP,WIF,IMX,SUI,APT,ICP,BTC,APE,ALGO,ARPA,WIN,ONE,SXP,DGB,CKB,VET,EOS,ROSE,GRT,1INCH,REN,LRC,BAT,ENJ,IOST,ANKR,DODO,OGN,CLV,IOTX,REQ,QI,STORJ,SKL,NKN,CTSI,TLM,LTO,AUDIO,KAVA,RSR,POND,LINA,PEOPLE,GMT,CFX,POL,TAO,AEVO,BB,CATI,HMSTR,EIGEN
+    #   - IGNORECURRENCY=USDT
+    #   - BASE_KEEP=1000
+
+  # nats:
+  #   image: nats:2.10.22-alpine3.20
+  #   container_name: nats
+  #   restart: always
+  #   hostname: nats
+  #   command: --js
+

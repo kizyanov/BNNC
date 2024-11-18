@@ -1,0 +1,17 @@
+services:
+  balancer:
+    image: kizyanov/bnnc_balancer:latest
+    build: .
+    container_name: bnnc_balancer
+    tty: true
+    restart: always
+    links:
+     - nats:nats
+
+  nats:
+    image: nats:2.10.22-alpine3.20
+    container_name: nats
+    restart: always
+    hostname: nats
+    command: --js
+

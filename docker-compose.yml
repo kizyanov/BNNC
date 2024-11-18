@@ -1,0 +1,72 @@
+services:
+  composter:
+    image: kizyanov/bnnc_composter:latest
+    container_name: bnnc_composter
+    tty: true
+    restart: always
+    depends_on:
+     - balancer
+     - processor
+     - nats
+    links:
+     - nats:nats
+    env_file:
+      - .env
+    # environment:
+    #   - ALLCURRENCY=OP,WIF,IMX,SUI,APT,ICP,BTC,APE,ALGO,ARPA,WIN,ONE,SXP,DGB,CKB,VET,EOS,ROSE,GRT,1INCH,REN,LRC,BAT,ENJ,IOST,ANKR,DODO,OGN,CLV,IOTX,REQ,QI,STORJ,SKL,NKN,CTSI,TLM,LTO,AUDIO,KAVA,RSR,POND,LINA,PEOPLE,GMT,CFX,POL,TAO,AEVO,BB,CATI,HMSTR,EIGEN
+    #   - IGNORECURRENCY=USDT
+    #   - BASE_KEEP=1000
+
+
+  # orderest:
+  #   image: kizyanov/bnnc_orderest:latest
+  #   container_name: bnnc_orderest
+  #   tty: true
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - processor
+  #     - nats
+
+  # balancer:
+  #   image: kizyanov/bnnc_balancer:latest
+  #   container_name: bnnc_balancer
+  #   tty: true
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - processor
+  #     - nats
+  #   links:
+  #    - nats:nats
+
+  # processor:
+  #   image: kizyanov/bnnc_processor:latest
+  #   build: .
+  #   container_name: bnnc_processor
+  #   tty: true
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - nats
+  #   links:
+  #    - nats:nats
+
+  # alertest:
+  #   image: kizyanov/bnnc_alertest:latest
+  #   container_name: bnnc_alertest
+  #   tty: true
+  #   restart: always
+  #   env_file:
+  #     - .env
+      
+  nats:
+    image: nats:2.10.16-alpine3.19
+    container_name: nats
+    restart: always
+    hostname: nats
+    command: --js
+
