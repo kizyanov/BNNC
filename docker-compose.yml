@@ -1,12 +1,12 @@
 services:
-  composter:
+  bnnc_composter:
     image: kizyanov/bnnc_composter:latest
     container_name: bnnc_composter
     tty: true
     restart: always
     depends_on:
-     - balancer
-     - processor
+    #  - balancer
+    #  - processor
      - nats
     links:
      - nats:nats
@@ -64,7 +64,7 @@ services:
   #     - .env
       
   nats:
-    image: nats:2.10.16-alpine3.19
+    image: nats:2.10.22-alpine3.20
     container_name: nats
     restart: always
     hostname: nats
