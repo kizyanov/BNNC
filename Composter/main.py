@@ -5,7 +5,7 @@ import orjson
 import uvloop
 from decouple import Csv, config
 from loguru import logger
-from websockets.asyncio.client import connect
+from websockets import connect
 
 from models import Token
 from natslocal import get_js_context

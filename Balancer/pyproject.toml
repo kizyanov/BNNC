@@ -7,13 +7,13 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "3.12.7"
 loguru = "0.7.2"
 nats-py = "2.9.0"
 uvloop = "0.21.0"
-orjson = "3.10.10"
+orjson = "3.10.11"
 python-decouple = "3.8"
-setuptools = "75.2.0"
+setuptools = "75.5.0"
 
 
 [build-system]
