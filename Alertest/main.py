@@ -1,5 +1,4 @@
 import asyncio
-import uvloop
 from decouple import config, Csv
 from loguru import logger
 from decimal import Decimal
@@ -88,5 +87,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
-        runner.run(main())
+    asyncio.run(main())

@@ -1,10 +1,10 @@
 import asyncio
 from decimal import Decimal
-from nats.js import JetStreamContext
+
 import orjson
-import uvloop
 from decouple import Csv, config
 from loguru import logger
+from nats.js import JetStreamContext
 from websockets import connect
 
 from models import Token
@@ -22,19 +22,13 @@ async def main():
         ignore_currency=config("IGNORECURRENCY", cast=Csv(str)),
         base_keep=Decimal(config("BASE_KEEP", cast=int)),
     )
-
-    await js.add_stream(name="bnnc", subjects=["candle", "balance"])
-
+    
     async def event(msg: dict, js: JetStreamContext, token: Token) -> None:
         symbol = msg["s"]
         open_price = msg["o"]
 
         if token.history[symbol] != open_price:
             logger.info(f"{symbol}:{open_price}")
-            # await js.publish(
-            #     "candle",
-            #     orjson.dumps({symbol: open_price}),
-            # )
             token.history[symbol] = open_price
 
     token.init_history()
@@ -60,5 +54,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
-        runner.run(main())
+    asyncio.run(main())
