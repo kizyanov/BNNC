@@ -169,7 +169,7 @@ async def get_actual_token_stats(
 ) -> None:
     """Get actual all tokens stats."""
     logger.info("Run get_actual_token_stats")
-    # await get_available_funds(access, token)
+    await get_available_funds(access, token)
     # await get_tokens(access, token)
 
     # servertimestamp = await get_server_timestamp(access)
