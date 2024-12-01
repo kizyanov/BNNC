@@ -42,9 +42,6 @@ def get_telegram_msg(token: Token, bot_profit: dict) -> str:
 <i>DELETED</i>():
 <i>NEW</i>({len(token.new_tokens)}):{",".join(token.new_tokens)}
 <i>IGNORE</i>({len(token.ignore_currency)}):{",".join(token.ignore_currency)}
-
-<i>BOT PROFIT LIST</i>
-<i>BOT PROFIT SUM(week)</i>: USDT
 """
 
 
