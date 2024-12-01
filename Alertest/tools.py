@@ -89,7 +89,7 @@ async def get_symbol_list(
 
 def hmac_signature(access: Access, query_string: str) -> str:
     return hmac.new(
-        access.key.encode(),
+        access.secret.encode(),
         query_string.encode(),
         hashlib.sha256,
     ).hexdigest()
