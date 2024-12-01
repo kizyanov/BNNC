@@ -34,7 +34,7 @@ def get_telegram_msg(token: Token, bot_profit: dict) -> str:
     """Prepare telegram msg."""
     return f"""<b>Binance</b>
 
-<i>KEEP</i>:
+<i>KEEP</i>:{token.base_keep}
 <i>USDT</i>:
 <i>BORROWING USDT</i>: (%)
 <i>ALL TOKENS</i>:
