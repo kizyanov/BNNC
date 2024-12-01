@@ -1,9 +1,10 @@
 """Tools for Alertest."""
 
+import hashlib
+import hmac
 from time import time
 from urllib.parse import urljoin
-import hmac
-import hashlib
+
 import aiohttp
 import pendulum
 from loguru import logger
@@ -116,7 +117,7 @@ async def get_margin_account(access: Access) -> dict:
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/account?{d}"
+            url=f"https://api.binance.com/sapi/v1/margin/account?{d}",
         ) as resp:
             l = await resp.json()
             return l

@@ -57,7 +57,7 @@ async def get_available_funds(
     token.new_tokens = [
         i["asset"]
         for i in margin_account["userAssets"]
-        if i["asser"] not in token.ignore_currency
+        if i["asset"] not in token.ignore_currency
     ]
 
     # for i in [i for i in margin_account["accounts"] if i["currency"] == "USDT"]:
