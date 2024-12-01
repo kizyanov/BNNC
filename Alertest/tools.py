@@ -2,7 +2,8 @@
 
 from time import time
 from urllib.parse import urljoin
-
+import hmac
+import hashlib
 import aiohttp
 import pendulum
 from loguru import logger
@@ -86,28 +87,39 @@ async def get_symbol_list(
     )
 
 
-async def get_margin_account(
-    access: Access,
-    params: dict,
-    *,
-    method: str = "GET",
-    uri: str = "/api/v3/margin/accounts",
-) -> dict:
+def hmac_signature(access: Access, query_string: str) -> str:
+    return hmac.new(
+        access.key.encode(),
+        query_string.encode(),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
     logger.info("Run get_margin_account")
 
-    uri += "?" + get_data_json(params)
-    now_time = str(int(time()) * 1000)
+    timestamp = int(time() * 1000)
 
-    return await request(
-        urljoin(access.base_uri, uri),
-        method,
-        get_headers(
-            access,
-            f"{now_time}{method}{uri}",
-            now_time,
-        ),
-    )
+    data = {"recvWindows": 10000, "timestamp": timestamp}
+
+    query_string = "&".join([f"{k}={v}" for k, v in data.items()])
+
+    logger.info(query_string)
+
+    signature = hmac_signature(access, query_string)
+    data.update({"signature": signature})
+
+    d = "&".join(f"{k}={v}" for k, v in data.items())
+
+    headers = {"X-MBX-APIKEY": access.key}
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(
+            url=f"https://api.binance.com/sapi/v1/margin/account?{d}"
+        ) as resp:
+            l = await resp.json()
+            logger.info(l)
 
 
 async def send_telegram_msg(telegram: Telegram, text: str) -> None:
