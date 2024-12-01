@@ -5,18 +5,13 @@ services:
     tty: true
     restart: always
     depends_on:
-    #  - balancer
+     - bnnc_alertest
     #  - processor
      - bnnc_nats
     links:
      - bnnc_nats:bnnc_nats
     env_file:
       - .env
-    # environment:
-    #   - ALLCURRENCY=OP,WIF,IMX,SUI,APT,ICP,BTC,APE,ALGO,ARPA,WIN,ONE,SXP,DGB,CKB,VET,EOS,ROSE,GRT,1INCH,REN,LRC,BAT,ENJ,IOST,ANKR,DODO,OGN,CLV,IOTX,REQ,QI,STORJ,SKL,NKN,CTSI,TLM,LTO,AUDIO,KAVA,RSR,POND,LINA,PEOPLE,GMT,CFX,POL,TAO,AEVO,BB,CATI,HMSTR,EIGEN
-    #   - IGNORECURRENCY=USDT
-    #   - BASE_KEEP=1000
-
 
   # orderest:
   #   image: kizyanov/bnnc_orderest:latest
@@ -55,13 +50,13 @@ services:
   #   links:
   #    - nats:nats
 
-  # alertest:
-  #   image: kizyanov/bnnc_alertest:latest
-  #   container_name: bnnc_alertest
-  #   tty: true
-  #   restart: always
-  #   env_file:
-  #     - .env
+  bnnc_alertest:
+    image: kizyanov/bnnc_alertest:latest
+    container_name: bnnc_alertest
+    tty: true
+    restart: always
+    env_file:
+      - .env
       
   bnnc_nats:
     image: nats:2.10.22-alpine3.20
