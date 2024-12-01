@@ -56,10 +56,8 @@ async def get_available_funds(
     logger.info("Run get_available_funds")
 
     margin_account = await get_margin_account(access)
-
-
-    for i in margin_account['userAssets']:
-        token.new_tokens += i['asset']
+    
+    token.new_tokens = [ i['assert'] for i in margin_account['userAssets']]
 
     # for i in [i for i in margin_account["accounts"] if i["currency"] == "USDT"]:
     #     token.borrow_size = Decimal(i["liability"])
