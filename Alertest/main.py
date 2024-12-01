@@ -38,10 +38,10 @@ def get_telegram_msg(token: Token, bot_profit: dict) -> str:
 <i>USDT</i>:
 <i>BORROWING USDT</i>: (%)
 <i>ALL TOKENS</i>:
-<i>USED TOKENS</i>():
+<i>USED TOKENS</i>({len(token.accept_tokens)}):{",".join(token.accept_tokens)}
 <i>DELETED</i>():
-<i>NEW</i>({len(token.new_tokens)}):{token.new_tokens}
-<i>IGNORE</i>():
+<i>NEW</i>({len(token.new_tokens)}):{",".join(token.new_tokens)}
+<i>IGNORE</i>({len(token.ignore_currency)}):{",".join(token.ignore_currency)}
 
 <i>BOT PROFIT LIST</i>
 <i>BOT PROFIT SUM(week)</i>: USDT
