@@ -40,7 +40,7 @@ def get_telegram_msg(token: Token, bot_profit: dict) -> str:
 <i>ALL TOKENS</i>:
 <i>USED TOKENS</i>():
 <i>DELETED</i>():
-<i>NEW</i>():
+<i>NEW</i>({len(token.new_tokens)}):{token.new_tokens}
 <i>IGNORE</i>():
 
 <i>BOT PROFIT LIST</i>
@@ -56,6 +56,10 @@ async def get_available_funds(
     logger.info("Run get_available_funds")
 
     margin_account = await get_margin_account(access)
+
+
+    for i in margin_account['userAssets']:
+        token.new_tokens += i['asset']
 
     # for i in [i for i in margin_account["accounts"] if i["currency"] == "USDT"]:
     #     token.borrow_size = Decimal(i["liability"])

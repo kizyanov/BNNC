@@ -119,7 +119,7 @@ async def get_margin_account(access: Access) -> dict:
             url=f"https://api.binance.com/sapi/v1/margin/account?{d}"
         ) as resp:
             l = await resp.json()
-            logger.info(l)
+            return l
 
 
 async def send_telegram_msg(telegram: Telegram, text: str) -> None:
