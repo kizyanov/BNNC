@@ -10,9 +10,9 @@ package-mode = false
 python = "3.13.0"
 loguru = "0.7.2"
 nats-py = "2.9.0"
-orjson = "3.10.11"
+orjson = "3.10.12"
 python-decouple = "3.8"
-setuptools = "75.5.0"
+setuptools = "75.6.0"
 
 
 [build-system]
