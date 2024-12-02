@@ -1,3 +1,5 @@
+"""bnnc_composeter."""
+
 import asyncio
 from decimal import Decimal
 
@@ -11,7 +13,7 @@ from models import Token
 from natslocal import get_js_context
 
 
-async def main():
+async def main() -> None:
     """Main func in microservice."""
     js = await get_js_context()
 
@@ -22,7 +24,7 @@ async def main():
         ignore_currency=config("IGNORECURRENCY", cast=Csv(str)),
         base_keep=Decimal(config("BASE_KEEP", cast=int)),
     )
-    
+
     async def event(msg: dict, js: JetStreamContext, token: Token) -> None:
         symbol = msg["s"]
         open_price = msg["o"]

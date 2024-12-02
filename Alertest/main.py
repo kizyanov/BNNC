@@ -8,10 +8,8 @@ from loguru import logger
 
 from models import Access, Telegram, Token
 from tools import (
-    get_filled_order_list,
     get_margin_account,
     get_seconds_to_next_minutes,
-    get_server_timestamp,
     get_symbol_list,
     send_telegram_msg,
 )
@@ -30,7 +28,6 @@ def get_start_at_for_week(now_mill: int) -> int:
     return now_mill - WEEK_IN_MILLISECONDS
 
 
-
 async def get_available_funds(
     access: Access,
     token: Token,
@@ -46,6 +43,7 @@ async def get_available_funds(
         if i["asset"] not in token.ignore_currency
     ]
 
+
 async def get_tokens(access: Access, token: Token) -> None:
     """Get available tokens."""
     logger.info("Run get_tokens")
@@ -54,7 +52,6 @@ async def get_tokens(access: Access, token: Token) -> None:
     token.save_accept_tokens(all_token_in_excange)
     token.save_new_tokens(all_token_in_excange)
     token.save_del_tokens()
-
 
 
 async def get_actual_token_stats(

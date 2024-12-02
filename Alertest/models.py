@@ -150,8 +150,7 @@ class Telegram:
         """Return list chat id users."""
         return self.telegram_bot_chat_id
 
-
-    def get_telegram_msg(self:Self, token: Token) -> str:
+    def get_telegram_msg(self: Self, token: Token) -> str:
         """Prepare telegram msg."""
         return f"""<b>Binance</b>
         <i>KEEP</i>:{token.base_keep}

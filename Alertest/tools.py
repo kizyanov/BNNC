@@ -89,6 +89,7 @@ async def get_symbol_list(
 
 
 def hmac_signature(access: Access, query_string: str) -> str:
+    """Get hmac sign msg."""
     return hmac.new(
         access.secret.encode(),
         query_string.encode(),
@@ -113,14 +114,11 @@ async def get_margin_account(access: Access) -> dict:
 
     d = "&".join(f"{k}={v}" for k, v in data.items())
 
-    headers = {"X-MBX-APIKEY": access.key}
-
-    async with aiohttp.ClientSession(headers=headers) as session:
+    async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
         async with session.get(
             url=f"https://api.binance.com/sapi/v1/margin/account?{d}",
         ) as resp:
-            l = await resp.json()
-            return l
+            return await resp.json()
 
 
 async def send_telegram_msg(telegram: Telegram, text: str) -> None:
