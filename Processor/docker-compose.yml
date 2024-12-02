@@ -1,19 +1,18 @@
 services:
-  processor:
+  bnnc_processor:
     image: kizyanov/bnnc_processor:latest
     build: .
     container_name: bnnc_processor
     tty: true
     restart: always
     links:
-     - nats:nats
+      - nats:nats
     environment:
       - CURRENCY=OP,KCS,WIF,IMX,SUI,APT,ICP,BTC,APE,FRONT
 
-  nats:
+  bnnc_nats:
     image: nats:2.10.22-alpine3.20
-    container_name: nats
+    container_name: bnnc_nats
     restart: always
     hostname: nats
     command: --js
-
