@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "composter"
+name = "bnnc_composter"
 version = "0.1.0"
 description = ""
 authors = ["''"]
