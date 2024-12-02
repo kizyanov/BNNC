@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "alertest"
+name = "bnnc_alertest"
 version = "0.1.0"
 description = ""
 authors = ["''"]
@@ -7,13 +7,12 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12.7"
-aiohttp = { extras = ["speedups"], version = "3.11.8" }
+python = "3.13.0"
+aiohttp = { extras = ["speedups"], version = "3.11.9" }
 loguru = "0.7.2"
 orjson = "3.10.12"
 python-decouple = "3.8"
 setuptools = "75.6.0"
-pendulum = "3.0.0"
 
 [tool.ruff]
 lint.select = ["ALL"]

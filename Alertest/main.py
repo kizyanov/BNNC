@@ -1,4 +1,4 @@
-"""Alertest."""
+"""Bnnc Alertest."""
 
 import asyncio
 from decimal import Decimal
@@ -30,20 +30,6 @@ def get_start_at_for_week(now_mill: int) -> int:
     return now_mill - WEEK_IN_MILLISECONDS
 
 
-def get_telegram_msg(token: Token, bot_profit: dict) -> str:
-    """Prepare telegram msg."""
-    return f"""<b>Binance</b>
-
-<i>KEEP</i>:{token.base_keep}
-<i>USDT</i>:
-<i>BORROWING USDT</i>: (%)
-<i>ALL TOKENS</i>:
-<i>USED TOKENS</i>({len(token.accept_tokens)}):{",".join(token.accept_tokens)}
-<i>DELETED</i>():
-<i>NEW</i>({len(token.new_tokens)}):{",".join(token.new_tokens)}
-<i>IGNORE</i>({len(token.ignore_currency)}):{",".join(token.ignore_currency)}
-"""
-
 
 async def get_available_funds(
     access: Access,
@@ -60,11 +46,6 @@ async def get_available_funds(
         if i["asset"] not in token.ignore_currency
     ]
 
-    # for i in [i for i in margin_account["accounts"] if i["currency"] == "USDT"]:
-    #     token.borrow_size = Decimal(i["liability"])
-    #     token.avail_size = Decimal(i["available"])
-
-
 async def get_tokens(access: Access, token: Token) -> None:
     """Get available tokens."""
     logger.info("Run get_tokens")
@@ -74,95 +55,6 @@ async def get_tokens(access: Access, token: Token) -> None:
     token.save_new_tokens(all_token_in_excange)
     token.save_del_tokens()
 
-
-def save_by_symbol(saved_orders: dict, order: dict) -> dict:
-    """Save by symbol."""
-    clean_symbol = Token.remove_postfix(order["symbol"])
-
-    if clean_symbol not in saved_orders:
-        saved_orders[clean_symbol] = []
-
-    saved_orders[clean_symbol].append(
-        {
-            "time": order["createdAt"],
-            "deal": Decimal(order["dealFunds"]) - Decimal(order["fee"]),
-            "side": order["side"],
-            "price": Decimal(order["price"]),
-        },
-    )
-    return saved_orders
-
-
-def unpack(saved_orders: dict, orders: list) -> dict:
-    """Unpack orders to used structure."""
-
-    for order in orders:
-        saved_orders = save_by_symbol(saved_orders, order)
-
-    return saved_orders
-
-
-async def get_orders(access: Access, startat: int) -> dict:
-    """."""
-    saved_orders = {}
-    orders = await get_filled_order_list(
-        access,
-        {
-            "status": "done",
-            "type": "limit",
-            "tradeType": "MARGIN_TRADE",
-            "pageSize": "500",
-            "startAt": startat,
-        },
-    )
-
-    saved_orders.update(unpack(saved_orders, orders["items"]))
-
-    for i in range(2, orders["totalPage"] + 1):
-        orders = await get_filled_order_list(
-            access,
-            {
-                "status": "done",
-                "type": "limit",
-                "tradeType": "MARGIN_TRADE",
-                "pageSize": "500",
-                "currentPage": i,
-                "startAt": startat,
-            },
-        )
-        saved_orders.update(unpack(saved_orders, orders["items"]))
-
-    # sort by time execution
-    [saved_orders[symbol].sort(key=lambda x: x["time"]) for symbol in saved_orders]
-
-    return saved_orders
-
-
-def calc_profit(compound: dict) -> Decimal:
-    """Calc bot profit by history orders data."""
-    return -compound["deal"] if compound["side"] == "buy" else compound["deal"]
-
-
-def calc_profit_vs_hodl(value: list) -> dict:
-    """Calc diff between bot and hodl profit."""
-    profit = Decimal("0")
-
-    for compound in value:
-        profit += calc_profit(compound)
-
-    hodl_profit = (value[-1]["price"] / value[0]["price"] - 1) * 1000
-
-    return {"bot_profit": profit, "hodl_profit": hodl_profit}
-
-
-def calc_bot_profit(orders: dict) -> dict:
-    """Calc bot profit."""
-    result = {}
-    for order, value in orders.items():
-        profit = calc_profit_vs_hodl(value)
-
-        result.update({order: profit["bot_profit"] - profit["hodl_profit"]})
-    return result
 
 
 async def get_actual_token_stats(
@@ -177,8 +69,6 @@ async def get_actual_token_stats(
 
     # servertimestamp = await get_server_timestamp(access)
 
-    # orders = await get_orders(access, get_start_at_for_week(servertimestamp))
-
     msg = get_telegram_msg(token, {})
     logger.warning(msg)
     await send_telegram_msg(telegram, msg)
@@ -192,12 +82,14 @@ async def main() -> None:
     """
     logger.info("Run Alertest microservice")
 
+    # Access object
     access = Access(
         key=config("KEY", cast=str),
         secret=config("SECRET", cast=str),
         base_uri="https://api.binance.com",
     )
 
+    # Token's object
     token = Token(
         time_shift=config("TIME_SHIFT", cast=str, default="1h"),
         base_stable=config("BASE_STABLE", cast=str, default="USDT"),
@@ -206,6 +98,7 @@ async def main() -> None:
         base_keep=Decimal(config("BASE_KEEP", cast=int)),
     )
 
+    # Telegram object
     telegram = Telegram(
         telegram_bot_key=config("TELEGRAM_BOT_API_KEY", cast=str),
         telegram_bot_chat_id=config("TELEGRAM_BOT_CHAT_ID", cast=Csv(str)),
