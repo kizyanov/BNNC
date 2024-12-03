@@ -24,18 +24,18 @@ services:
   #     - processor
   #     - nats
 
-  # bnnc_balancer:
-  #   image: kizyanov/bnnc_balancer:latest
-  #   container_name: bnnc_balancer
-  #   tty: true
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - processor
-  #     - nats
-  #   links:
-  #    - bnnc_nats:bnnc_nats
+  bnnc_balancer:
+    image: kizyanov/bnnc_balancer:latest
+    container_name: bnnc_balancer
+    tty: true
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - bnnc_processor
+      - bnnc_nats
+    links:
+      - bnnc_nats:bnnc_nats
 
   bnnc_processor:
     image: kizyanov/bnnc_processor:latest
