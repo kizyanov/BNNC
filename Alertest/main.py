@@ -8,9 +8,9 @@ from loguru import logger
 
 from models import Access, Telegram, Token
 from tools import (
+    get_all_margin_pairs,
     get_margin_account,
     get_seconds_to_next_minutes,
-    get_symbol_list,
     send_telegram_msg,
 )
 
@@ -37,12 +37,6 @@ async def get_available_funds(
 
     margin_account = await get_margin_account(access)
 
-    token.new_tokens = [
-        i["asset"]
-        for i in margin_account["userAssets"]
-        if i["asset"] not in token.ignore_currency
-    ]
-
     usdt = [i for i in margin_account["userAssets"] if i["asset"] == "USDT"]
     free_usdt = usdt[0]["free"]
     borrowet_usdt = usdt[0]["borrowed"]
@@ -54,10 +48,10 @@ async def get_available_funds(
 async def get_tokens(access: Access, token: Token) -> None:
     """Get available tokens."""
     logger.info("Run get_tokens")
-    all_token_in_excange = await get_symbol_list(access)
+    all_token_pairs_in_excange = await get_all_margin_pairs(access)
 
-    token.save_accept_tokens(all_token_in_excange)
-    token.save_new_tokens(all_token_in_excange)
+    token.save_accept_tokens(all_token_pairs_in_excange)
+    token.save_new_tokens(all_token_pairs_in_excange)
     token.save_del_tokens()
 
 
@@ -69,6 +63,8 @@ async def get_actual_token_stats(
     """Get actual all tokens stats."""
     logger.info("Run get_actual_token_stats")
     await get_available_funds(access, token)
+    await get_tokens(access, token)
+
     msg = telegram.get_telegram_msg(token)
     logger.warning(msg)
     await send_telegram_msg(telegram, msg)

@@ -73,21 +73,6 @@ def get_headers(
     return result
 
 
-async def get_symbol_list(
-    access: Access,
-    *,
-    method: str = "GET",
-    uri: str = "/api/v2/symbols",
-) -> dict:
-    """Get all tokens in excange."""
-    logger.info("Run get_symbol_list")
-    return await request(
-        urljoin(access.base_uri, uri),
-        method,
-        get_headers(auth=False),
-    )
-
-
 def hmac_signature(access: Access, query_string: str) -> str:
     """Get hmac sign msg."""
     return hmac.new(
@@ -117,6 +102,28 @@ async def get_margin_account(access: Access) -> dict:
     async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
         async with session.get(
             url=f"https://api.binance.com/sapi/v1/margin/account?{d}",
+        ) as resp:
+            return await resp.json()
+
+
+async def get_all_margin_pairs(access: Access) -> dict:
+    """Get all margin pairs."""
+    logger.info("Run get_all_margin_pairs")
+
+    timestamp = int(time() * 1000)
+
+    data = {"recvWindows": 10000, "timestamp": timestamp}
+
+    query_string = "&".join([f"{k}={v}" for k, v in data.items()])
+
+    signature = hmac_signature(access, query_string)
+    data.update({"signature": signature})
+
+    d = "&".join(f"{k}={v}" for k, v in data.items())
+
+    async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
+        async with session.get(
+            url=f"https://api.binance.com/sapi/v1/margin/allPairs?{d}",
         ) as resp:
             return await resp.json()
 
