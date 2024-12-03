@@ -14,8 +14,17 @@ from natslocal import get_js_context
 
 async def candle(msg: Msg) -> None:
     """Collect data of open price each candle by interval."""
-    logger.debug(msg.data.decode())
+    data = orjson.loads(msg.data)
+    logger.info(data)
     # symbol, price_str = orjson.loads(msg.data).popitem()
+
+    await msg.ack()
+
+
+async def balance(msg: Msg) -> None:
+    """Collect balance of each tokens."""
+    data = orjson.loads(msg.data)
+    logger.info(data)
 
     await msg.ack()
 
@@ -44,6 +53,7 @@ async def main() -> None:
     await js.add_stream(name="bnnc", subjects=["candle", "balance"])
 
     await js.subscribe("candle", "candle", cb=candle)
+    await js.subscribe("balance", "balance", cb=balance)
 
     await asyncio.sleep(60 * 60 * 24 * 365)
 
