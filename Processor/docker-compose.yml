@@ -7,12 +7,12 @@ services:
     restart: always
     # links:
     #   - bnnc_nats:bnnc_nats
-    environment:
-      - CURRENCY=OP,KCS,WIF,IMX,SUI,APT,ICP,BTC,APE,FRONT
+    # environment:
+    #   - CURRENCY=OP,KCS,WIF,IMX,SUI,APT,ICP,BTC,APE,FRONT
 
-  # bnnc_nats:
-  #   image: nats:2.10.22-alpine3.20
-  #   container_name: bnnc_nats
-  #   restart: always
-  #   hostname: nats
-  #   command: --js
+    # bnnc_nats:
+    #   image: nats:2.10.22-alpine3.20
+    #   container_name: bnnc_nats
+    #   restart: always
+    #   hostname: nats
+    #   command: --js

@@ -6,7 +6,7 @@ services:
     restart: always
     depends_on:
       - bnnc_alertest
-      #  - processor
+      - bnnc_processor
       - bnnc_nats
     links:
       - bnnc_nats:bnnc_nats
@@ -35,20 +35,19 @@ services:
   #     - processor
   #     - nats
   #   links:
-  #    - nats:nats
+  #    - bnnc_nats:bnnc_nats
 
-  # bnnc_processor:
-  #   image: kizyanov/bnnc_processor:latest
-  #   build: .
-  #   container_name: bnnc_processor
-  #   tty: true
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - nats
-  #   links:
-  #    - nats:nats
+  bnnc_processor:
+    image: kizyanov/bnnc_processor:latest
+    container_name: bnnc_processor
+    tty: true
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - bnnc_nats
+    links:
+      - bnnc_nats:bnnc_nats
 
   bnnc_alertest:
     image: kizyanov/bnnc_alertest:latest
