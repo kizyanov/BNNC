@@ -98,37 +98,30 @@ class Token:
         """Get len of new_tokens."""
         return len(self.new_tokens)
 
-    @staticmethod
-    def remove_postfix(symbol: str, postfix: str = "-USDT") -> str:
-        """Remove postfix."""
-        return symbol.replace(postfix, "")
-
-    def save_accept_tokens(self: Self, all_token_in_excange: dict) -> None:
+    def save_accept_tokens(self: Self, all_token_in_excange: list) -> None:
         """Save all accepted token."""
         self.accept_tokens = [
-            Token.remove_postfix(token_in_excange["symbol"])
+            token_in_excange["base"]
             for token_in_excange in all_token_in_excange
-            if token_in_excange["isMarginEnabled"]
-            and token_in_excange["quoteCurrency"] == "USDT"
-            and Token.remove_postfix(token_in_excange["symbol"])
-            not in self.ignore_currency
+            if token_in_excange["quote"] == "USDT"
+            and token_in_excange["base"] not in self.ignore_currency
+            and token_in_excange["isMarginTrade"]
+            and token_in_excange["isBuyAllowed"]
         ]
 
-    def save_new_tokens(self: Self, all_token_in_excange: dict) -> None:
+    def save_new_tokens(self: Self, all_token_in_excange: list) -> None:
         """Get all new token for trade."""
         self.new_tokens = [
-            Token.remove_postfix(token_in_excange["symbol"])
+            token_in_excange["base"]
             for token_in_excange in all_token_in_excange
-            if token_in_excange["quoteCurrency"] == "USDT"
-            and token_in_excange["isMarginEnabled"]
-            and Token.remove_postfix(token_in_excange["symbol"])
-            not in self.trade_currency
-            and Token.remove_postfix(token_in_excange["symbol"])
-            not in self.ignore_currency
+            if token_in_excange["quote"] == "USDT"
+            and token_in_excange["isMarginTrade"]
+            and token_in_excange["base"] not in self.trade_currency
+            and token_in_excange["base"] not in self.ignore_currency
         ]
 
     def save_del_tokens(self: Self) -> None:
-        """."""
+        """Show all token which deleted from accept_tokens but exist in trade_currency."""
         self.del_tokens = [
             used for used in self.trade_currency if used not in self.accept_tokens
         ]
@@ -151,7 +144,10 @@ class Telegram:
         return self.telegram_bot_chat_id
 
     def get_telegram_msg(self: Self, token: Token) -> str:
-        """Prepare telegram msg."""
+        """Prepare telegram msg.
+
+        ALL TOKENS All tokens accepted by rules trade on margin and quote by USDT
+        """
         return f"""<b>Binance</b>
 
 <i>KEEP</i>:{token.base_keep}
