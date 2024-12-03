@@ -35,7 +35,7 @@ class Token:
         currency: list,
         ignore_currency: list,
         base_keep: Decimal,
-        time_shift: str = "1hour",
+        time_shift: str = "1h",
         base_stable: str = "USDT",
     ) -> None:
         """Init class for store trade tokens."""
@@ -153,12 +153,12 @@ class Telegram:
     def get_telegram_msg(self: Self, token: Token) -> str:
         """Prepare telegram msg."""
         return f"""<b>Binance</b>
-        <i>KEEP</i>:{token.base_keep}
-        <i>USDT</i>:
-        <i>BORROWING USDT</i>: (%)
-        <i>ALL TOKENS</i>:
-        <i>USED TOKENS</i>({len(token.accept_tokens)}):{",".join(token.accept_tokens)}
-        <i>DELETED</i>():
-        <i>NEW</i>({len(token.new_tokens)}):{",".join(token.new_tokens)}
-        <i>IGNORE</i>({len(token.ignore_currency)}):{",".join(token.ignore_currency)}
-        """
+
+<i>KEEP</i>:{token.base_keep}
+<i>USDT</i>:{token.avail_size:.2f}
+<i>BORROWING USDT</i>:{token.get_clear_borrow():.2f} ({token.get_percent_borrow():.2f}%)
+<i>ALL TOKENS</i>:{token.get_len_accept_tokens()}
+<i>USED TOKENS</i>({token.get_len_trade_currency()}):{",".join(token.trade_currency)}
+<i>DELETED</i>({token.get_len_del_tokens()}):{",".join(token.del_tokens)}
+<i>NEW</i>({len(token.new_tokens)}):{",".join(token.new_tokens)}
+<i>IGNORE</i>({len(token.ignore_currency)}):{",".join(token.ignore_currency)}"""

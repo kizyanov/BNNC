@@ -10,11 +10,10 @@ from typing import Self
 class Access:
     """Class for store access condention to exchange."""
 
-    def __init__(self, key: str, secret: str, passphrase: str, base_uri: str) -> None:
+    def __init__(self, key: str, secret: str, base_uri: str) -> None:
         """Init access condention keys."""
         self.key: str = key
         self.secret: str = secret
-        self.passphrase: str = passphrase
         self.base_uri: str = base_uri
 
     def encrypted(self: Self, msg: str) -> str:
@@ -36,7 +35,7 @@ class Token:
         currency: list,
         ignore_currency: list,
         base_keep: Decimal,
-        time_shift: str = "1hour",
+        time_shift: str = "1h",
         base_stable: str = "USDT",
     ) -> None:
         """Init class for store trade tokens."""
