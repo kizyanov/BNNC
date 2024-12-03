@@ -12,7 +12,6 @@ aiohttp = { extras = ["speedups"], version = "3.11.9" }
 loguru = "0.7.2"
 orjson = "3.10.12"
 python-decouple = "3.8"
-setuptools = "75.6.0"
 
 [tool.ruff]
 lint.select = ["ALL"]
@@ -20,6 +19,8 @@ lint.ignore = ["FA102", "E501"]
 lint.fixable = ["I", "COM"]
 lint.mccabe.max-complexity = 2
 lint.pydocstyle.convention = "google"
+
+target-version = "py313"
 
 [build-system]
 requires = ["poetry-core"]

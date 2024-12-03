@@ -12,9 +12,9 @@ services:
     #   - IGNORECURRENCY=USDT
     #   - BASE_KEEP=1000
 
-  # nats:
+  # bnnc_nats:
   #   image: nats:2.10.22-alpine3.20
-  #   container_name: nats
+  #   container_name: bnnc_nats
   #   restart: always
   #   hostname: nats
   #   command: --js

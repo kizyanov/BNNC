@@ -13,7 +13,7 @@ services:
     env_file:
       - .env
 
-  # orderest:
+  # bnnc_orderest:
   #   image: kizyanov/bnnc_orderest:latest
   #   container_name: bnnc_orderest
   #   tty: true
@@ -24,7 +24,7 @@ services:
   #     - processor
   #     - nats
 
-  # balancer:
+  # bnnc_balancer:
   #   image: kizyanov/bnnc_balancer:latest
   #   container_name: bnnc_balancer
   #   tty: true
@@ -37,7 +37,7 @@ services:
   #   links:
   #    - nats:nats
 
-  # processor:
+  # bnnc_processor:
   #   image: kizyanov/bnnc_processor:latest
   #   build: .
   #   container_name: bnnc_processor
