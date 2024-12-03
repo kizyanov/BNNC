@@ -43,6 +43,13 @@ async def get_available_funds(
         if i["asset"] not in token.ignore_currency
     ]
 
+    usdt = [i for i in margin_account["userAssets"] if i["asset"] == "USDT"]
+    free_usdt = usdt[0]["free"]
+    borrowet_usdt = usdt[0]["borrowed"]
+
+    token.avail_size = Decimal(free_usdt)
+    token.borrow_size = Decimal(borrowet_usdt)
+
 
 async def get_tokens(access: Access, token: Token) -> None:
     """Get available tokens."""
