@@ -10,7 +10,7 @@ import aiohttp
 from loguru import logger
 from orjson import loads
 
-from models import Access, Telegram
+from models import Access
 
 
 def get_data_json(params: dict) -> str:
