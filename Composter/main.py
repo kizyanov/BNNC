@@ -1,3 +1,5 @@
+"""bnnc_composeter."""
+
 import asyncio
 from decimal import Decimal
 
@@ -11,10 +13,11 @@ from models import Token
 from natslocal import get_js_context
 
 
-async def main():
+async def main() -> None:
     """Main func in microservice."""
     js = await get_js_context()
 
+    # Token's object
     token = Token(
         time_shift=config("TIME_SHIFT", cast=str, default="1h"),
         base_stable=config("BASE_STABLE", cast=str, default="USDT"),
@@ -22,10 +25,13 @@ async def main():
         ignore_currency=config("IGNORECURRENCY", cast=Csv(str)),
         base_keep=Decimal(config("BASE_KEEP", cast=int)),
     )
-    
-    async def event(msg: dict, js: JetStreamContext, token: Token) -> None:
+
+    async def candle(msg: dict, js: JetStreamContext, token: Token) -> None:
         symbol = msg["s"]
         open_price = msg["o"]
+
+        # Need BTC-USDT format
+        logger.info(f"candle: {symbol}:{open_price} {msg}")
 
         if token.history[symbol] != open_price:
             logger.info(f"{symbol}:{open_price}")
@@ -43,7 +49,7 @@ async def main():
             recv = await ws.recv()
 
             task = asyncio.create_task(
-                event(
+                candle(
                     orjson.loads(recv)["data"]["k"],
                     js,
                     token,

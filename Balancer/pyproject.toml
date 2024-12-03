@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "balancer"
+name = "bnnc_balancer"
 version = "0.1.0"
 description = ""
 authors = ["''"]
@@ -10,10 +10,17 @@ package-mode = false
 python = "3.13.0"
 loguru = "0.7.2"
 nats-py = "2.9.0"
-orjson = "3.10.11"
+orjson = "3.10.12"
 python-decouple = "3.8"
-setuptools = "75.5.0"
 
+[tool.ruff]
+lint.select = ["ALL"]
+lint.ignore = ["FA102", "E501"]
+lint.fixable = ["I", "COM"]
+lint.mccabe.max-complexity = 2
+lint.pydocstyle.convention = "google"
+
+target-version = "py313"
 
 [build-system]
 requires = ["poetry-core"]

@@ -16,7 +16,7 @@ class Token:
         currency: list,
         ignore_currency: list,
         base_keep: Decimal,
-        time_shift: str = "1hour",
+        time_shift: str = "1h",
         base_stable: str = "USDT",
     ) -> None:
         """Init class for store trade tokens."""

@@ -5,15 +5,15 @@ services:
     tty: true
     restart: always
     depends_on:
-     - bnnc_alertest
-    #  - processor
-     - bnnc_nats
+      - bnnc_alertest
+      #  - processor
+      - bnnc_nats
     links:
-     - bnnc_nats:bnnc_nats
+      - bnnc_nats:bnnc_nats
     env_file:
       - .env
 
-  # orderest:
+  # bnnc_orderest:
   #   image: kizyanov/bnnc_orderest:latest
   #   container_name: bnnc_orderest
   #   tty: true
@@ -24,7 +24,7 @@ services:
   #     - processor
   #     - nats
 
-  # balancer:
+  # bnnc_balancer:
   #   image: kizyanov/bnnc_balancer:latest
   #   container_name: bnnc_balancer
   #   tty: true
@@ -37,7 +37,7 @@ services:
   #   links:
   #    - nats:nats
 
-  # processor:
+  # bnnc_processor:
   #   image: kizyanov/bnnc_processor:latest
   #   build: .
   #   container_name: bnnc_processor
@@ -57,11 +57,10 @@ services:
     restart: always
     env_file:
       - .env
-      
+
   bnnc_nats:
     image: nats:2.10.22-alpine3.20
     container_name: bnnc_nats
     restart: always
     hostname: bnnc_nats
     command: --js
-
