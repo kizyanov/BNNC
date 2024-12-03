@@ -30,10 +30,8 @@ async def main() -> None:
         symbol = msg["s"]
         open_price = msg["o"]
 
-        # Need BTC-USDT format
-        logger.info(f"candle: {symbol}:{open_price} {msg}")
-
         if token.history[symbol] != open_price:
+            # symbol has BTCUSDT format
             logger.info(f"{symbol}:{open_price}")
             token.history[symbol] = open_price
 

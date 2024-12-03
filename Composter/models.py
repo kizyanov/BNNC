@@ -43,6 +43,7 @@ class Token:
 
     def init_history(self: Self) -> None:
         """Init history."""
+        # format BTCUSDT:"1234567898.00"
         self.history = {f"{key}{self.base_stable}": "" for key in self.trade_currency}
 
     def get_candles_for_kline(self: Self) -> str:
