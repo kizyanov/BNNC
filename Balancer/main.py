@@ -1,3 +1,4 @@
+"""Bnnc Balancer."""
 import asyncio
 from decouple import config, Csv
 
