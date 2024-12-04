@@ -26,15 +26,15 @@ async def fill_base_increment(orderbook: OrderBook) -> None:
 
     for symbol in symbol_info["symbols"]:
 
-        ticksize_filter = [
+        step = [
             filter_symbol
             for filter_symbol in symbol["filters"]
-            if filter_symbol["filterType"] == "PRICE_FILTER"
-        ][0]
+            if filter_symbol["filterType"] == "LOT_SIZE"
+        ][0]["stepSize"]
 
         orderbook.fill_base_increment_by_symbol(
             symbol["symbol"],
-            ticksize_filter["tickSize"],
+            step[: step.index("1") + 1],  # 0.010000000 to 0.01
         )
 
 
@@ -63,8 +63,8 @@ async def init_order_book(
 
 async def run_keep_alive(access: Access, listenKey: str) -> None:
     while True:
-        await asyncio.sleep(600)  # sleep 10 min
         await keep_alive_listen_key(access, listenKey)
+        await asyncio.sleep(600)  # sleep 10 min
 
 
 async def balance(
@@ -75,31 +75,30 @@ async def balance(
     """Work with change amount of balance on exchange."""
     logger.info(msg)
 
-    # if (
-    #     currency != "USDT"  # ignore income USDT in balance
-    #     and relationevent
-    #     in [
-    #         "margin.hold",
-    #         "margin.setted",
-    #     ]
-    #     and currency in orderbook.order_book
-    #     and available
-    #     != orderbook.order_book[currency][
-    #         "available"
-    #     ]  # ignore income qeuals available tokens
-    # ):
-    #     orderbook.order_book[currency]["available"] = available
-    #     await js.publish(
-    #         "balance",
-    #         orjson.dumps(
-    #             {
-    #                 "symbol": f"{currency}-USDT",
-    #                 "baseincrement": orderbook.order_book[currency]["baseincrement"],
-    #                 "available": orderbook.order_book[currency]["available"],
-    #             },
-    #         ),
-    #     )
-    #     logger.success(f"Success sent:{currency}:{available}")
+    if msg["e"] == "outboundAccountPosition":
+        # {'e': 'outboundAccountPosition', 'E': 1733347691452, 'u': 1733347691452, 'B': [{'a': 'USDT', 'f': '2000.07982380', 'l': '0.00000000'}]}
+        for symbol in msg["B"]:
+            logger.info(symbol)
+            if symbol["a"] != "USDT":
+
+                # token name + symbol['a']  BTCUSDT
+                symbol_ = f"{symbol['a']}USDT"
+
+                await js.publish(
+                    "balance",
+                    orjson.dumps(
+                        {
+                            "symbol": symbol_,
+                            "baseincrement": orderbook.order_book[symbol_][
+                                "baseincrement"
+                            ],
+                            "available": symbol["f"],
+                        },
+                    ),
+                )
+                orderbook.order_book[symbol_]["available"] = symbol["f"]
+
+                logger.success(f"Success sent:{symbol_}:{ symbol['f']}")
 
 
 async def web_socket(listen_key: str, orderbook: OrderBook, js: JetStreamContext):
@@ -112,7 +111,6 @@ async def web_socket(listen_key: str, orderbook: OrderBook, js: JetStreamContext
 
         while True:
             msg = await ws.recv()
-            logger.info(msg)
 
             task = asyncio.create_task(
                 balance(

@@ -7,22 +7,20 @@ services:
     depends_on:
       - bnnc_alertest
       - bnnc_processor
+      - bnnc_balancer
       - bnnc_nats
     links:
       - bnnc_nats:bnnc_nats
     env_file:
       - .env
 
-  # bnnc_orderest:
-  #   image: kizyanov/bnnc_orderest:latest
-  #   container_name: bnnc_orderest
-  #   tty: true
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - processor
-  #     - nats
+  bnnc_orderest:
+    image: kizyanov/bnnc_orderest:latest
+    container_name: bnnc_orderest
+    tty: true
+    restart: always
+    env_file:
+      - .env
 
   bnnc_balancer:
     image: kizyanov/bnnc_balancer:latest

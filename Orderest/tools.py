@@ -79,8 +79,6 @@ async def get_order_list(access: Access) -> dict:
 
     query_string = "&".join([f"{k}={v}" for k, v in data.items()])
 
-    logger.info(query_string)
-
     signature = access.encrypted(query_string)
     data.update({"signature": signature})
 

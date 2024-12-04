@@ -134,7 +134,7 @@ async def keep_alive_listen_key(access: Access, listen_key: str) -> dict:
     logger.info("Run get_websocket_listen_key")
 
     params = {"listenKey": listen_key}
-
+    logger.info("Keep Alive")
     async with (
         aiohttp.ClientSession(
             headers={

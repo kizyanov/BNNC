@@ -37,11 +37,13 @@ def get_side_and_size(
         tokens_count = (token.base_keep - new_balance) / price
         side = "buy"
 
+    logger.info(f"{tokens_count=}")
     # Round by increment token
     size = tokens_count.quantize(
         baseincrement,
         ROUND_DOWN,
     )
+    logger.info(f"{size=}")
 
     return {"side": side, "size": size}
 
@@ -78,7 +80,7 @@ async def candle(msg: Msg) -> None:
                     side=sidze["side"],
                     price=price,
                     symbol=symbol,
-                    size=sidze["size"],
+                    size=float(sidze["size"]),
                 )
 
     await msg.ack()
