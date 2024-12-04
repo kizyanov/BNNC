@@ -12,7 +12,8 @@ loguru = "0.7.2"
 nats-py = "2.9.0"
 orjson = "3.10.12"
 python-decouple = "3.8"
-aiohttp = {extras = ["speedups"], version = "3.11.9"}
+aiohttp = { extras = ["speedups"], version = "3.11.9" }
+websockets = "14.1"
 
 [tool.ruff]
 lint.select = ["ALL"]

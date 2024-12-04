@@ -2,7 +2,6 @@
 
 import hashlib
 import hmac
-from base64 import b64encode
 from decimal import Decimal
 from typing import Self
 
@@ -18,13 +17,11 @@ class Access:
 
     def encrypted(self: Self, msg: str) -> str:
         """Encrypted msg for exchange."""
-        return b64encode(
-            hmac.new(
-                self.secret.encode("utf-8"),
-                msg.encode("utf-8"),
-                hashlib.sha256,
-            ).digest(),
-        ).decode()
+        return hmac.new(
+            self.secret.encode("utf-8"),
+            msg.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
 
 
 class Token:

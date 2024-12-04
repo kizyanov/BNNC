@@ -2,7 +2,6 @@
 
 import hashlib
 import hmac
-from base64 import b64encode
 from decimal import Decimal
 from typing import Self
 
@@ -22,13 +21,11 @@ class Access:
 
     def encrypted(self: Self, msg: str) -> str:
         """Encrypted msg for exchange."""
-        return b64encode(
-            hmac.new(
-                self.secret.encode("utf-8"),
-                msg.encode("utf-8"),
-                hashlib.sha256,
-            ).digest(),
-        ).decode()
+        return hmac.new(
+            self.secret.encode("utf-8"),
+            msg.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
 
 
 class Token:
@@ -138,8 +135,14 @@ class OrderBook:
     """Class for store orders data from excange."""
 
     def __init__(self: Self, token: Token) -> None:
-        """Init order book by symbol from config by available 0."""
-        self.order_book: dict = {s: {"available": "0"} for s in token.trade_currency}
+        """Init order book by symbol from config by available 0.
+
+        {"BTCUSDT": {"available":"0"}}
+        """
+        self.order_book: dict = {
+            f"{symbol}{token.base_stable}": {"available": "0"}
+            for symbol in token.trade_currency
+        }
 
     def fill_order_book(self: Self, account_list: dict) -> None:
         """Fill real available from exchange."""
@@ -151,7 +154,7 @@ class OrderBook:
             },
         )
 
-    def fill_base_increment(self: Self, symbol_increments: dict) -> None:
+    def fill_base_increment_by_symbol(self: Self, symbol: str, increment: str) -> None:
         """Fill real baseincrement from exchange.
 
         after:
@@ -162,13 +165,28 @@ class OrderBook:
         """
         self.order_book.update(
             {
-                symbol_increment["baseCurrency"]: {
-                    "baseincrement": symbol_increment["baseIncrement"],
-                    "available": self.order_book[symbol_increment["baseCurrency"]],
-                }
-                for symbol_increment in symbol_increments
-                if symbol_increment["baseCurrency"] in self.order_book
-                and symbol_increment["quoteCurrency"] == "USDT"
+                symbol: {
+                    "baseincrement": increment,
+                    "available": self.order_book[symbol]["available"],
+                },
+            },
+        )
+
+    def fill_base_available_by_symbol(self: Self, symbol: str, available: str) -> None:
+        """Fill real baseincrement from exchange.
+
+        after:
+        {"ICP":{"baseincrement":"0.0001"}}
+
+        before:
+        {"ICP":{"baseincrement":"0.0001", "available":"1"}}
+        """
+        self.order_book.update(
+            {
+                symbol: {
+                    "baseincrement": self.order_book[symbol]["baseincrement"],
+                    "available": available,
+                },
             },
         )
 
@@ -176,13 +194,11 @@ class OrderBook:
         """Send first run balance state."""
         for symbol, value in self.order_book.items():
             data = {
-                "symbol": f"{symbol}USDT",
+                "symbol": symbol,
                 "baseincrement": value["baseincrement"],
-                "available": value["available"]["available"],
+                "available": value["available"],
             }
-            logger.info(
-                f"{data['symbol']}\t{data['baseincrement']}\t{data['available']}",
-            )
+            logger.info(data)
             await js.publish(
                 "balance",
                 orjson.dumps(data),
