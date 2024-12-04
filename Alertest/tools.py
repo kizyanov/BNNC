@@ -81,8 +81,6 @@ async def get_margin_account(access: Access) -> dict:
 
     query_string = "&".join([f"{k}={v}" for k, v in data.items()])
 
-    logger.info(query_string)
-
     signature = access.encrypted(query_string)
     data.update({"signature": signature})
 
