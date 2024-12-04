@@ -1,7 +1,5 @@
 """Tools for Alertest."""
 
-import hashlib
-import hmac
 from datetime import UTC, datetime
 from time import time
 from urllib.parse import urljoin
@@ -73,15 +71,6 @@ def get_headers(
     return result
 
 
-def hmac_signature(access: Access, query_string: str) -> str:
-    """Get hmac sign msg."""
-    return hmac.new(
-        access.secret.encode(),
-        query_string.encode(),
-        hashlib.sha256,
-    ).hexdigest()
-
-
 async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
     logger.info("Run get_margin_account")
@@ -94,16 +83,21 @@ async def get_margin_account(access: Access) -> dict:
 
     logger.info(query_string)
 
-    signature = hmac_signature(access, query_string)
+    signature = access.encrypted(query_string)
     data.update({"signature": signature})
 
-    d = "&".join(f"{k}={v}" for k, v in data.items())
-
-    async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
-        async with session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/account?{d}",
-        ) as resp:
-            return await resp.json()
+    async with (
+        aiohttp.ClientSession(
+            headers={
+                "X-MBX-APIKEY": access.key,
+            },
+        ) as session,
+        session.get(
+            url=f"https://api.binance.com/sapi/v1/margin/account",
+            params=data,
+        ) as resp,
+    ):
+        return await resp.json()
 
 
 async def get_all_margin_pairs(access: Access) -> dict:
@@ -116,16 +110,21 @@ async def get_all_margin_pairs(access: Access) -> dict:
 
     query_string = "&".join([f"{k}={v}" for k, v in data.items()])
 
-    signature = hmac_signature(access, query_string)
+    signature = access.encrypted(query_string)
     data.update({"signature": signature})
 
-    d = "&".join(f"{k}={v}" for k, v in data.items())
-
-    async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
-        async with session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/allPairs?{d}",
-        ) as resp:
-            return await resp.json()
+    async with (
+        aiohttp.ClientSession(
+            headers={
+                "X-MBX-APIKEY": access.key,
+            },
+        ) as session,
+        session.get(
+            url=f"https://api.binance.com/sapi/v1/margin/allPairs",
+            params=data,
+        ) as resp,
+    ):
+        return await resp.json()
 
 
 async def send_telegram_msg(telegram: Telegram, text: str) -> None:
@@ -158,49 +157,3 @@ def get_seconds_to_next_minutes(minutes: int) -> int:
         result_minute = minutes - now.minute
 
     return result_minute * 60
-
-
-async def get_filled_order_list(
-    access: Access,
-    params: dict,
-    *,
-    method: str = "GET",
-    uri: str = "/api/v1/orders",
-) -> dict:
-    """Get all active orders in excange."""
-    logger.info("Run get_order_list")
-
-    uri += "?" + get_data_json(params)
-    now_time = str(int(time()) * 1000)
-
-    return await request(
-        urljoin(access.base_uri, uri),
-        method,
-        get_headers(
-            access,
-            f"{now_time}{method}{uri}",
-            now_time,
-        ),
-    )
-
-
-async def get_server_timestamp(
-    access: Access,
-    *,
-    uri: str = "/api/v1/timestamp",
-    method: str = "GET",
-) -> dict:
-    """Get timestamp from excange server."""
-    logger.info("Run get_server_timestamp")
-
-    now_time = str(int(time()) * 1000)
-
-    return await request(
-        urljoin(access.base_uri, uri),
-        method,
-        get_headers(
-            access,
-            f"{now_time}{method}{uri}",
-            now_time,
-        ),
-    )

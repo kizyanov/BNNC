@@ -1,10 +1,7 @@
 """Tools for Alertest."""
 
-import hashlib
-import hmac
 from datetime import UTC, datetime
 from time import time
-from urllib.parse import urljoin
 
 import aiohttp
 from loguru import logger
@@ -47,15 +44,6 @@ async def request(
         return result
 
 
-def hmac_signature(access: Access, query_string: str) -> str:
-    """Get hmac sign msg."""
-    return hmac.new(
-        access.secret.encode(),
-        query_string.encode(),
-        hashlib.sha256,
-    ).hexdigest()
-
-
 async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
     logger.info("Run get_margin_account")
@@ -66,16 +54,42 @@ async def get_margin_account(access: Access) -> dict:
 
     query_string = "&".join([f"{k}={v}" for k, v in data.items()])
 
-    signature = hmac_signature(access, query_string)
+    signature = access.encrypted(query_string)
     data.update({"signature": signature})
 
-    d = "&".join(f"{k}={v}" for k, v in data.items())
+    async with (
+        aiohttp.ClientSession(
+            headers={"X-MBX-APIKEY": access.key},
+        ) as session,
+        session.get(
+            url=f"https://api.binance.com/sapi/v1/margin/account",
+            params=data,
+        ) as resp,
+    ):
+        return await resp.json()
 
-    async with aiohttp.ClientSession(headers={"X-MBX-APIKEY": access.key}) as session:
-        async with session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/account?{d}",
-        ) as resp:
-            return await resp.json()
+
+async def exchangeinfo(tokens: list[str]) -> dict:
+    """Get ExcangeInfo about tickSize.
+
+    https://api.binance.com/api/v3/exchangeInfo?symbols=["ADAUSDT","BTCUSDT"]
+    """
+    logger.info("Run exchangeinfo")
+
+    filter_tokens = str(tokens).replace(" ", "").replace("'", '"')
+
+    url = "https://api.binance.com/api/v3/exchangeInfo"
+
+    async with (
+        aiohttp.ClientSession() as session,
+        session.get(
+            url=url,
+            params={
+                "symbols": filter_tokens,
+            },
+        ) as resp,
+    ):
+        return await resp.json()
 
 
 def get_seconds_to_next_minutes(minutes: int) -> int:
@@ -90,3 +104,46 @@ def get_seconds_to_next_minutes(minutes: int) -> int:
         result_minute = minutes - now.minute
 
     return result_minute * 60
+
+
+async def get_websocket_listen_key(access: Access) -> dict:
+    """Get listenKey for websocket.
+
+    return
+    {
+            "listenKey": "..."
+    }
+    """
+    logger.info("Run get_websocket_listen_key")
+
+    async with (
+        aiohttp.ClientSession(
+            headers={
+                "X-MBX-APIKEY": access.key,
+            },
+        ) as session,
+        session.post(
+            url=f"https://api.binance.com/sapi/v1/userDataStream",
+        ) as resp,
+    ):
+        return await resp.json()
+
+
+async def keep_alive_listen_key(access: Access, listen_key: str) -> dict:
+    """KeepAlive for listenKey."""
+    logger.info("Run get_websocket_listen_key")
+
+    params = {"listenKey": listen_key}
+
+    async with (
+        aiohttp.ClientSession(
+            headers={
+                "X-MBX-APIKEY": access.key,
+            },
+        ) as session,
+        session.put(
+            url=f"https://api.binance.com/sapi/v1/userDataStream",
+            params=params,
+        ) as resp,
+    ):
+        return await resp.json()
