@@ -2,7 +2,6 @@
 
 from datetime import UTC, datetime
 from time import time
-from urllib.parse import urljoin
 
 import aiohttp
 from loguru import logger
@@ -73,8 +72,6 @@ def get_headers(
 
 async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
-    logger.info("Run get_margin_account")
-
     timestamp = int(time() * 1000)
 
     data = {"recvWindows": 10000, "timestamp": timestamp}
@@ -91,7 +88,7 @@ async def get_margin_account(access: Access) -> dict:
             },
         ) as session,
         session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/account",
+            url="https://api.binance.com/sapi/v1/margin/account",
             params=data,
         ) as resp,
     ):
@@ -100,8 +97,6 @@ async def get_margin_account(access: Access) -> dict:
 
 async def get_all_margin_pairs(access: Access) -> dict:
     """Get all margin pairs."""
-    logger.info("Run get_all_margin_pairs")
-
     timestamp = int(time() * 1000)
 
     data = {"recvWindows": 10000, "timestamp": timestamp}
@@ -118,7 +113,7 @@ async def get_all_margin_pairs(access: Access) -> dict:
             },
         ) as session,
         session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/allPairs",
+            url="https://api.binance.com/sapi/v1/margin/allPairs",
             params=data,
         ) as resp,
     ):
@@ -145,8 +140,6 @@ async def send_telegram_msg(telegram: Telegram, text: str) -> None:
 
 def get_seconds_to_next_minutes(minutes: int) -> int:
     """Get next 10:00 minutes."""
-    logger.info("Run get_seconds_to_next_minutes")
-
     now = datetime.now(tz=UTC)
 
     if now.minute >= minutes:

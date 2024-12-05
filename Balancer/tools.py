@@ -46,8 +46,6 @@ async def request(
 
 async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
-    logger.info("Run get_margin_account")
-
     timestamp = int(time() * 1000)
 
     data = {"recvWindows": 10000, "timestamp": timestamp}
@@ -62,7 +60,7 @@ async def get_margin_account(access: Access) -> dict:
             headers={"X-MBX-APIKEY": access.key},
         ) as session,
         session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/account",
+            url="https://api.binance.com/sapi/v1/margin/account",
             params=data,
         ) as resp,
     ):
@@ -74,8 +72,6 @@ async def exchangeinfo(tokens: list[str]) -> dict:
 
     https://api.binance.com/api/v3/exchangeInfo?symbols=["ADAUSDT","BTCUSDT"]
     """
-    logger.info("Run exchangeinfo")
-
     filter_tokens = str(tokens).replace(" ", "").replace("'", '"')
 
     url = "https://api.binance.com/api/v3/exchangeInfo"
@@ -94,8 +90,6 @@ async def exchangeinfo(tokens: list[str]) -> dict:
 
 def get_seconds_to_next_minutes(minutes: int) -> int:
     """Get next 10:00 minutes."""
-    logger.info("Run get_seconds_to_next_minutes")
-
     now = datetime.now(tz=UTC)
 
     if now.minute >= minutes:
@@ -109,13 +103,10 @@ def get_seconds_to_next_minutes(minutes: int) -> int:
 async def get_websocket_listen_key(access: Access) -> dict:
     """Get listenKey for websocket.
 
-    return
     {
             "listenKey": "..."
     }
     """
-    logger.info("Run get_websocket_listen_key")
-
     async with (
         aiohttp.ClientSession(
             headers={
@@ -123,7 +114,7 @@ async def get_websocket_listen_key(access: Access) -> dict:
             },
         ) as session,
         session.post(
-            url=f"https://api.binance.com/sapi/v1/userDataStream",
+            url="https://api.binance.com/sapi/v1/userDataStream",
         ) as resp,
     ):
         return await resp.json()
@@ -131,10 +122,7 @@ async def get_websocket_listen_key(access: Access) -> dict:
 
 async def keep_alive_listen_key(access: Access, listen_key: str) -> dict:
     """KeepAlive for listenKey."""
-    logger.info("Run get_websocket_listen_key")
-
     params = {"listenKey": listen_key}
-    logger.info("Keep Alive")
     async with (
         aiohttp.ClientSession(
             headers={
@@ -142,7 +130,7 @@ async def keep_alive_listen_key(access: Access, listen_key: str) -> dict:
             },
         ) as session,
         session.put(
-            url=f"https://api.binance.com/sapi/v1/userDataStream",
+            url="https://api.binance.com/sapi/v1/userDataStream",
             params=params,
         ) as resp,
     ):

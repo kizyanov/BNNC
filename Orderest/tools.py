@@ -62,7 +62,7 @@ async def cancel_order(access: Access, symbol: str, order_id: int) -> None:
             },
         ) as session,
         session.delete(
-            url=f"https://api.binance.com/sapi/v1/margin/order",
+            url="https://api.binance.com/sapi/v1/margin/order",
             params=data,
         ) as resp,
     ):
@@ -71,8 +71,6 @@ async def cancel_order(access: Access, symbol: str, order_id: int) -> None:
 
 async def get_order_list(access: Access) -> dict:
     """Get all active orders in excange."""
-    logger.info("Run get_order_list")
-
     timestamp = int(time() * 1000)
 
     data = {"recvWindows": 10000, "timestamp": timestamp}
@@ -87,7 +85,7 @@ async def get_order_list(access: Access) -> dict:
             headers={"X-MBX-APIKEY": access.key},
         ) as session,
         session.get(
-            url=f"https://api.binance.com/sapi/v1/margin/openOrders",
+            url="https://api.binance.com/sapi/v1/margin/openOrders",
             params=data,
         ) as resp,
     ):
@@ -96,8 +94,6 @@ async def get_order_list(access: Access) -> dict:
 
 def get_seconds_to_next_minutes(minutes: int) -> int:
     """Get next 10:00 minutes."""
-    logger.info("Run get_seconds_to_next_minutes")
-
     now = datetime.now(tz=UTC)
 
     if now.minute > minutes:

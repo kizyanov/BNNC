@@ -11,8 +11,6 @@ from models import Access
 
 async def get_margin_account(access: Access) -> dict:
     """Get margin account user data."""
-    logger.info("Run get_margin_account")
-
     timestamp = int(time() * 1000)
 
     data = {"recvWindows": 10000, "timestamp": timestamp}
@@ -39,8 +37,6 @@ async def exchangeinfo(tokens: list[str]) -> dict:
 
     https://api.binance.com/api/v3/exchangeInfo?symbols=["ADAUSDT","BTCUSDT"]
     """
-    logger.info("Run exchangeinfo")
-
     filter_tokens = str(tokens).replace(" ", "").replace("'", '"')
 
     url = "https://api.binance.com/api/v3/exchangeInfo"
@@ -65,10 +61,8 @@ async def make_margin_limit_order(
     size: float,
 ) -> dict:
     """Make limit order by price."""
-    logger.info(f"Run make_margin_limit_order:{side}:{symbol}")
-
+    logger.info(f"{side=}:{price=}:{symbol=}:{size=}")
     timestamp = int(time() * 1000)
-
 
     data = {
         "symbol": symbol,
@@ -88,8 +82,6 @@ async def make_margin_limit_order(
     signature = access.encrypted(query_string)
     data.update({"signature": signature})
 
-    logger.info(data)
-
     async with (
         aiohttp.ClientSession(
             headers={
@@ -102,5 +94,4 @@ async def make_margin_limit_order(
             data=data,
         ) as resp,
     ):
-        d = await resp.json()
-        logger.info(d)
+        await resp.json()

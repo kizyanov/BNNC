@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import Self
 
 import orjson
-from loguru import logger
 from nats.js import JetStreamContext
 
 
@@ -193,13 +192,13 @@ class OrderBook:
     async def send_balance(self: Self, js: JetStreamContext) -> None:
         """Send first run balance state."""
         for symbol, value in self.order_book.items():
-            data = {
-                "symbol": symbol,
-                "baseincrement": value["baseincrement"],
-                "available": value["available"],
-            }
-            logger.info(data)
             await js.publish(
                 "balance",
-                orjson.dumps(data),
+                orjson.dumps(
+                    {
+                        "symbol": symbol,
+                        "baseincrement": value["baseincrement"],
+                        "available": value["available"],
+                    },
+                ),
             )
