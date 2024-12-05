@@ -33,7 +33,7 @@ async def main() -> None:
         if token.history[symbol] != open_price:
             # symbol has BTCUSDT format
             await js.publish("candle", orjson.dumps({symbol: open_price}))
-            logger.info(f"{symbol}:{open_price}")
+            logger.success(f"New candle:{symbol}:{open_price}")
             token.history[symbol] = open_price
 
     token.init_history()

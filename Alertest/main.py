@@ -33,21 +33,16 @@ async def get_available_funds(
     token: Token,
 ) -> None:
     """Get available funds in excechge."""
-    logger.info("Run get_available_funds")
-
     margin_account = await get_margin_account(access)
 
     usdt = [i for i in margin_account["userAssets"] if i["asset"] == "USDT"]
-    free_usdt = usdt[0]["free"]
-    borrowet_usdt = usdt[0]["borrowed"]
 
-    token.avail_size = Decimal(free_usdt)
-    token.borrow_size = Decimal(borrowet_usdt)
+    token.avail_size = Decimal(usdt[0]["free"])
+    token.borrow_size = Decimal(usdt[0]["borrowed"])
 
 
 async def get_tokens(access: Access, token: Token) -> None:
     """Get available tokens."""
-    logger.info("Run get_tokens")
     all_token_pairs_in_excange = await get_all_margin_pairs(access)
 
     token.save_accept_tokens(all_token_pairs_in_excange)
@@ -61,7 +56,6 @@ async def get_actual_token_stats(
     telegram: Telegram,
 ) -> None:
     """Get actual all tokens stats."""
-    logger.info("Run get_actual_token_stats")
     await get_available_funds(access, token)
     await get_tokens(access, token)
 

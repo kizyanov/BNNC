@@ -37,13 +37,11 @@ def get_side_and_size(
         tokens_count = (token.base_keep - new_balance) / price
         side = "buy"
 
-    logger.info(f"{tokens_count=}")
     # Round by increment token
     size = tokens_count.quantize(
         baseincrement,
         ROUND_DOWN,
     )
-    logger.info(f"{size=}")
 
     return {"side": side, "size": size}
 
@@ -54,11 +52,8 @@ async def candle(msg: Msg) -> None:
     recieve in format
     {"TRXUSDT": "0.38640000"}
     """
-    data = orjson.loads(msg.data)
-    logger.info(data)
-
-    for symbol, price in data.items():
-        logger.info(symbol, price)
+    for symbol, price in orjson.loads(msg.data).items():
+        logger.success(f"New candle:{symbol}:{price}")
 
         # check if token not yet send balance
         if symbol in ledger:
@@ -72,7 +67,6 @@ async def candle(msg: Msg) -> None:
             )
 
             if sidze["size"] != Decimal("0.0"):  # check on buy '0' count of tokens
-                logger.warning(sidze)
 
                 # make limit order
                 await make_margin_limit_order(
@@ -82,7 +76,6 @@ async def candle(msg: Msg) -> None:
                     symbol=symbol,
                     size=float(sidze["size"]),
                 )
-
     await msg.ack()
 
 

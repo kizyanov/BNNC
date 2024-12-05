@@ -7,7 +7,7 @@ import orjson
 from decouple import Csv, config
 from loguru import logger
 from nats.js import JetStreamContext
-from websockets import ClientProtocol, connect
+from websockets import connect
 
 from models import Access, OrderBook, Token
 from natslocal import get_js_context
@@ -20,7 +20,7 @@ from tools import (
 
 
 async def fill_base_increment(orderbook: OrderBook) -> None:
-
+    """Fill min increment size by ticket."""
     # Get exchangeinfo about tickSize
     symbol_info = await exchangeinfo(list(orderbook.order_book))
 
@@ -39,7 +39,7 @@ async def fill_base_increment(orderbook: OrderBook) -> None:
 
 
 async def fill_base_available(access: Access, orderbook: OrderBook) -> None:
-
+    """Fill base avaiable size on exchange."""
     # Get all assert for margin trade
     account_data = await get_margin_account(access)
 
@@ -49,6 +49,8 @@ async def fill_base_available(access: Access, orderbook: OrderBook) -> None:
         # filter only asset in order_book
         if custom_asset in orderbook.order_book:
             orderbook.fill_base_available_by_symbol(custom_asset, asset["free"])
+        elif asset["free"] != "0" and custom_asset != "USDTUSDT":
+            logger.warning(f"Ghost assert:{custom_asset}:{asset['free']}")
 
 
 async def init_order_book(
@@ -61,9 +63,10 @@ async def init_order_book(
     await fill_base_available(access, orderbook)
 
 
-async def run_keep_alive(access: Access, listenKey: str) -> None:
+async def run_keep_alive(access: Access, listenkey: str) -> None:
+    """Infinity sent PUT for KeepAlive."""
     while True:
-        await keep_alive_listen_key(access, listenKey)
+        await keep_alive_listen_key(access, listenkey)
         await asyncio.sleep(600)  # sleep 10 min
 
 
@@ -73,12 +76,9 @@ async def balance(
     js: JetStreamContext,
 ) -> None:
     """Work with change amount of balance on exchange."""
-    logger.info(msg)
-
     if msg["e"] == "outboundAccountPosition":
         # {'e': 'outboundAccountPosition', 'E': 1733347691452, 'u': 1733347691452, 'B': [{'a': 'USDT', 'f': '2000.07982380', 'l': '0.00000000'}]}
         for symbol in msg["B"]:
-            logger.info(symbol)
             if symbol["a"] != "USDT":
 
                 # token name + symbol['a']  BTCUSDT
@@ -98,10 +98,13 @@ async def balance(
                 )
                 orderbook.order_book[symbol_]["available"] = symbol["f"]
 
-                logger.success(f"Success sent:{symbol_}:{ symbol['f']}")
 
-
-async def web_socket(listen_key: str, orderbook: OrderBook, js: JetStreamContext):
+async def web_socket(
+    listen_key: str,
+    orderbook: OrderBook,
+    js: JetStreamContext,
+) -> None:
+    """Run infinity listening stream of balance."""
     async with connect(
         uri=f"wss://stream.binance.com:443/ws/{listen_key}",
         max_queue=1024,

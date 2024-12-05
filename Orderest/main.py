@@ -21,8 +21,6 @@ async def find_order_for_cancel(access: Access) -> None:
 
 async def main() -> None:
     """Main func in microservice."""
-    logger.info("Run Orderest microservice")
-
     # Access object
     access = Access(
         key=config("KEY", cast=str),
