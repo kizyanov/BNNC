@@ -37,8 +37,8 @@ async def get_available_funds(
 
     usdt = [i for i in margin_account["userAssets"] if i["asset"] == "USDT"]
 
-    token.avail_size = Decimal(usdt[0]["free"])
-    token.borrow_size = Decimal(usdt[0]["borrowed"])
+    token.avail_size = Decimal(usdt[0]["netAsset"])
+    token.borrow_size = Decimal(usdt[0]["borrowed"]) + Decimal(usdt[0]["interest"])
 
 
 async def get_tokens(access: Access, token: Token) -> None:
